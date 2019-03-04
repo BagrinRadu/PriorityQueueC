@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 // Node 
 typedef struct node { 
@@ -79,19 +81,69 @@ int isEmpty(Node** head)
 
 
 // Driver code 
-int main() 
+int main(int argc, char **argv) 
 { 
+	int i;
+	FILE *file;
+	char cmd[2000];
+	char val[2000];
+	long priority;
     // Create a Priority Queue 
-    // 7->4->5->6 
     Node* pq = newNode(4, 1); 
-    insert(&pq, 5, 2); 
-    insert(&pq, 6, 3); 
-    insert(&pq, 7, 0); 
+    // insert(&pq, 5, 2); 
+    // insert(&pq, 6, 3); 
+    // insert(&pq, 7, 0); 
   
-    while (!isEmpty(&pq)) { 
-        printf("%d ", top(&pq)); 
-        pop(&pq); 
-    } 
+    // while (!isEmpty(&pq)) { 
+    //     printf("%d ", top(&pq)); 
+    //     pop(&pq); 
+    // } 
+
+
+    // Open file if exists
+    if (argc > 1) {
+    	for (i = 1; i < argc; i++) {
+		    if ((file = fopen(argv[i], "r"))) {
+		    	while (1) {
+		    		fscanf(file, "%s", cmd);
+			    	if (strcmp(cmd, "insert") == 0) {
+			    		// insert
+			    		printf("%s ", cmd);
+			    		fscanf(file, "%s %ld", val, &priority);
+			    		printf("%s %ld\n", val, priority);
+			    	} else if (strcmp(cmd, "top") == 0) {
+			    		// top
+			    		printf("%s \n", cmd);
+			    	} else if (strcmp(cmd, "pop") == 0) {
+			    		// pop
+			    		printf("%s \n", cmd);
+			    	}
+
+			    	if (feof(file)) {
+		    			printf("GATAAA\n");
+     					break;
+		    		}
+			    }
+			    fclose(file);
+		    }
+    	}
+	} else {
+		// Read from standard input
+		scanf("%s", cmd);
+		if (strcmp(cmd, "insert") == 0) {
+    		// insert
+    		printf("%s ", cmd);
+    		scanf("%s %ld", val, &priority);
+    		printf("%s %ld\n", val, priority);
+    	} else if (strcmp(cmd, "top") == 0) {
+    		// top
+    		printf("%s \n", cmd);
+    	} else if (strcmp(cmd, "pop") == 0) {
+    		// pop
+    		printf("%s \n", cmd);
+    	}
+
+	}
   
     return 0; 
 } 
