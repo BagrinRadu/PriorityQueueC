@@ -5,7 +5,7 @@
 
 // Node 
 typedef struct node { 
-    int data; 
+    char data[200]; 
   
     // Lower values indicate higher priority 
     int priority; 
@@ -15,10 +15,9 @@ typedef struct node {
 } Node; 
 
 // Function to Create A New Node 
-Node* newNode(int d, int p) 
-{ 
+Node* newNode(char d[200], int p) { 
     Node* temp = (Node*)malloc(sizeof(Node)); 
-    temp->data = d; 
+    strcpy(temp->data, d); 
     temp->priority = p; 
     temp->next = NULL; 
   
@@ -27,8 +26,7 @@ Node* newNode(int d, int p)
 
 
 // Function to insert nodes according to priority 
-void insert(Node** head, int d, int p) 
-{ 
+void insert(Node** head, char d[200], int p) { 
     Node* start = (*head); 
   
     // Create new Node 
@@ -37,7 +35,7 @@ void insert(Node** head, int d, int p)
     // Special Case: The head of list has lesser 
     // priority than new node. So insert new 
     // node before head node and change head node. 
-    if ((*head)->priority > p) { 
+    if ((*head)->priority < p) { 
         // Insert New Node before head 
         temp->next = *head; 
         (*head) = temp; 
@@ -45,7 +43,7 @@ void insert(Node** head, int d, int p)
         // Traverse the list and find a 
         // position to insert new node 
         while (start->next != NULL && 
-               start->next->priority < p) { 
+               start->next->priority > p) { 
             start = start->next; 
         } 
   
@@ -57,22 +55,6 @@ void insert(Node** head, int d, int p)
 } 
   
 
-
-// Return the value at head 
-int top(Node** head) 
-{ 
-    return (*head)->data; 
-} 
-  
-// Removes the element with the 
-// highest priority form the list 
-void pop(Node** head) 
-{ 
-    Node* temp = *head; 
-    (*head) = (*head)->next; 
-    free(temp); 
-} 
-
 // Function to check is list is empty 
 int isEmpty(Node** head) 
 { 
@@ -80,47 +62,78 @@ int isEmpty(Node** head)
 } 
 
 
+// Return the value at head 
+char * top(Node** head) 
+{ 
+    return (*head)->data; 
+} 
+  
+
+
+// Removes the element with the 
+// highest priority form the list 
+void pop(Node** head) 
+{ 
+    if(!isEmpty(head)) {
+    	Node* temp = *head; 
+    	(*head) = (*head)->next; 
+    	free(temp); 
+	}
+} 
+
+
+
+
 // Driver code 
 int main(int argc, char **argv) 
 { 
-	int i;
+	int i, j, nr_spaces;
 	FILE *file;
-	char cmd[2000];
-	char val[2000];
+	char * line = NULL;
+	char * p;
+	ssize_t read;
+	size_t len = 0;
+	char cmd[200];
+	char val[200];
 	long priority;
     // Create a Priority Queue 
-    Node* pq = newNode(4, 1); 
-    // insert(&pq, 5, 2); 
-    // insert(&pq, 6, 3); 
-    // insert(&pq, 7, 0); 
-  
-    // while (!isEmpty(&pq)) { 
-    //     printf("%d ", top(&pq)); 
-    //     pop(&pq); 
-    // } 
+    Node* pq = NULL; 
 
 
     // Open file if exists
     if (argc > 1) {
     	for (i = 1; i < argc; i++) {
 		    if ((file = fopen(argv[i], "r"))) {
-		    	while (1) {
-		    		fscanf(file, "%s", cmd);
-			    	if (strcmp(cmd, "insert") == 0) {
-			    		// insert
-			    		printf("%s ", cmd);
-			    		fscanf(file, "%s %ld", val, &priority);
-			    		printf("%s %ld\n", val, priority);
-			    	} else if (strcmp(cmd, "top") == 0) {
-			    		// top
-			    		printf("%s \n", cmd);
-			    	} else if (strcmp(cmd, "pop") == 0) {
-			    		// pop
-			    		printf("%s \n", cmd);
+		    	while ((read = getline(&line, &len, file)) != -1) {
+		    		sscanf(line, "%s", cmd);
+		    		// Verify if this line is a valid command. If YES then execute it.
+			    	if (strcmp(cmd, "insert") == 0 && strlen(line) > 8) {
+			    		nr_spaces = 0;
+			    		for(j = 0; j < strlen(line); j++) {
+			    			if(line[j] == ' ') {
+			    				nr_spaces = nr_spaces + 1;
+			    			}
+			    		}
+			    		if (nr_spaces != 2) {
+			    			continue;
+			    		}
+			    		// Valid insert
+			    		sscanf(line, "%s %s %ld", cmd, val, &priority);
+
+			    		if(isEmpty(&pq)) {
+			    			pq = newNode(val, priority);
+			    		} else {
+			    			insert(&pq, val, priority);
+			    		}
+			    	} else if (strcmp(cmd, "top") == 0 && strlen(line) <= 5 && strlen(line) > 2) {
+			    		if(!isEmpty(&pq)) {
+			    			printf("%s\n", top(&pq));
+			    		} 
+			    	} else if (strcmp(cmd, "pop") == 0 && strlen(line) == 5 && strlen(line) > 2) {
+			    		pop(&pq);
 			    	}
 
 			    	if (feof(file)) {
-		    			printf("GATAAA\n");
      					break;
 		    		}
 			    }
@@ -145,5 +158,10 @@ int main(int argc, char **argv)
 
 	}
   
+	// while (!isEmpty(&pq)) { 
+ //        printf("%s ", top(&pq)); 
+ //        pop(&pq); 
+ //    } 
+
     return 0; 
 } 
