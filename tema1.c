@@ -89,10 +89,10 @@ int main(int argc, char **argv)
 { 
 	int i, j, nr_spaces;
 	FILE *file;
-	char * line = NULL;
+	char line[2000];
 	char * p;
-	ssize_t read;
-	size_t len = 0;
+	int read;
+	long unsigned int len = 0;
 	char cmd[200];
 	char val[200];
 	long priority;
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     if (argc > 1) {
     	for (i = 1; i < argc; i++) {
 		    if ((file = fopen(argv[i], "r"))) {
-		    	while ((read = getline(&line, &len, file)) != -1) {
+		    	while (fgets(line, sizeof(line), file) != NULL) {
 		    		sscanf(line, "%s", cmd);
 		    		// Verify if this line is a valid command. If YES then execute it.
 			    	if (strcmp(cmd, "insert") == 0 && strlen(line) > 8) {
@@ -119,17 +119,16 @@ int main(int argc, char **argv)
 			    		}
 			    		// Valid insert
 			    		sscanf(line, "%s %s %ld", cmd, val, &priority);
-
 			    		if(isEmpty(&pq)) {
 			    			pq = newNode(val, priority);
 			    		} else {
 			    			insert(&pq, val, priority);
 			    		}
-			    	} else if (strcmp(cmd, "top") == 0 && strlen(line) <= 5 && strlen(line) > 2) {
+			    	} else if (strncmp(cmd, "top", 3) == 0) {
 			    		if(!isEmpty(&pq)) {
 			    			printf("%s\n", top(&pq));
 			    		} 
-			    	} else if (strcmp(cmd, "pop") == 0 && strlen(line) == 5 && strlen(line) > 2) {
+			    	} else if (strncmp(cmd, "pop", 3) == 0) {
 			    		pop(&pq);
 			    	}
 
