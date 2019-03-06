@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "compare.h"
 
 // Node 
 typedef struct node { 
@@ -35,7 +35,8 @@ void insert(Node** head, char d[200], int p) {
     // Special Case: The head of list has lesser 
     // priority than new node. So insert new 
     // node before head node and change head node. 
-    if ((*head)->priority < p) { 
+    //if ((*head)->priority < p) { 
+    if (compare((*head)->priority, p) < 0) { 
         // Insert New Node before head 
         temp->next = *head; 
         (*head) = temp; 
@@ -43,7 +44,7 @@ void insert(Node** head, char d[200], int p) {
         // Traverse the list and find a 
         // position to insert new node 
         while (start->next != NULL && 
-               start->next->priority > p) { 
+               compare(start->next->priority, p) > 0) { 
             start = start->next; 
         } 
   
@@ -156,11 +157,12 @@ int main(int argc, char **argv)
     	}
 
 	}
-  
-	// while (!isEmpty(&pq)) { 
- //        printf("%s ", top(&pq)); 
- //        pop(&pq); 
- //    } 
+
+
+
+	while(!isEmpty(&pq)) {
+		pop(&pq);
+	}
 
     return 0; 
 } 
