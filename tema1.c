@@ -7,7 +7,6 @@
 typedef struct node { 
     char data[200]; 
   
-    // Lower values indicate higher priority 
     int priority; 
   
     struct node* next; 
@@ -108,7 +107,7 @@ int main(int argc, char **argv)
 		    	while (fgets(line, sizeof(line), file) != NULL) {
 		    		sscanf(line, "%s", cmd);
 		    		// Verify if this line is a valid command. If YES then execute it.
-			    	if (strcmp(cmd, "insert") == 0 && strlen(line) > 8) {
+			    	if (strncmp(line, "insert", 6) == 0 && strlen(line) > 8) {
 			    		nr_spaces = 0;
 			    		for(j = 0; j < strlen(line); j++) {
 			    			if(line[j] == ' ') {
@@ -125,11 +124,11 @@ int main(int argc, char **argv)
 			    		} else {
 			    			insert(&pq, val, priority);
 			    		}
-			    	} else if (strncmp(cmd, "top", 3) == 0) {
+			    	} else if (strncmp(line, "top", 3) == 0 && strlen(line) <= 5) {
 			    		if(!isEmpty(&pq)) {
 			    			printf("%s\n", top(&pq));
 			    		} 
-			    	} else if (strncmp(cmd, "pop", 3) == 0) {
+			    	} else if (strncmp(line, "pop", 3) == 0 && strlen(line) <= 5) {
 			    		pop(&pq);
 			    	}
 
@@ -141,21 +140,35 @@ int main(int argc, char **argv)
 		    }
     	}
 	} else {
-		// Read from standard input
-		scanf("%s", cmd);
-		if (strcmp(cmd, "insert") == 0) {
-    		// insert
-    		printf("%s ", cmd);
-    		scanf("%s %ld", val, &priority);
-    		printf("%s %ld\n", val, priority);
-    	} else if (strcmp(cmd, "top") == 0) {
-    		// top
-    		printf("%s \n", cmd);
-    	} else if (strcmp(cmd, "pop") == 0) {
-    		// pop
-    		printf("%s \n", cmd);
-    	}
 
+		while(fgets(line, sizeof(line), stdin)) {
+			sscanf(line, "%s", cmd);
+		    		// Verify if this line is a valid command. If YES then execute it.
+			    	if (strncmp(line, "insert", 6) == 0 && strlen(line) > 8) {
+			    		nr_spaces = 0;
+			    		for(j = 0; j < strlen(line); j++) {
+			    			if(line[j] == ' ') {
+			    				nr_spaces = nr_spaces + 1;
+			    			}
+			    		}
+			    		if (nr_spaces != 2) {
+			    			continue;
+			    		}
+			    		// Valid insert
+			    		sscanf(line, "%s %s %ld", cmd, val, &priority);
+			    		if(isEmpty(&pq)) {
+			    			pq = newNode(val, priority);
+			    		} else {
+			    			insert(&pq, val, priority);
+			    		}
+			    	} else if (strncmp(line, "top", 3) == 0 && strlen(line) <= 5) {
+			    		if(!isEmpty(&pq)) {
+			    			printf("%s\n", top(&pq));
+			    		} 
+			    	} else if (strncmp(line, "pop", 3) == 0 && strlen(line) <= 5) {
+			    		pop(&pq);
+			    	}
+		}
 	}
 
 
