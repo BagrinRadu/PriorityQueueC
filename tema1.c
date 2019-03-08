@@ -3,43 +3,40 @@
 #include <string.h>
 #include "compare.h"
 
+// Globals
 int fail;
 
-// Node 
-typedef struct node { 
-	char data[200]; 
-
-	int priority; 
-
-	struct node* next; 
-
+// Node
+typedef struct node {
+	char data[200];
+	int priority;
+	struct node *next;
 } Node;
 
-// Function to Create A New Node 
-Node* newNode(char d[200], int p)
-{ 
-	Node* temp = (Node*)malloc(sizeof(Node)); 
-	
-	if(temp == NULL) {
+// Function to Create A New Node
+Node *newNode(char d[200], int p)
+{
+	Node *temp = (Node *)malloc(sizeof(Node));
+
+	if (temp == NULL) {
 		fail = 1;
 		return temp;
 	}
 	
-	strcpy(temp->data, d); 
-	temp->priority = p; 
-	temp->next = NULL; 
+	strcpy(temp->data, d);
+	temp->priority = p;
+	temp->next = NULL;
 
-	return temp; 
+	return temp;
 }
 
-
 // Function to insert nodes according to priority
-void insert(Node** head, char d[200], int p)
+void insert(Node **head, char d[200], int p)
 {
-	Node* start = (*head);
+	Node *start = (*head);
 
 	// Create new Node
-	Node* temp = newNode(d, p);
+	Node *temp = newNode(d, p);
 
 	if (temp != NULL) {
 		// Special Case: The head of list has lesser
@@ -67,24 +64,23 @@ void insert(Node** head, char d[200], int p)
 }
 
 // Function to check is list is empty
-int isEmpty(Node** head)
+int isEmpty(Node **head)
 {
 	return (*head) == NULL;
 }
 
 // Return the value at head
-char * top(Node** head)
+char *top(Node **head)
 {
 	return (*head)->data;
-} 
-
+}
 
 // Removes the element with the
 // highest priority form the list
-void pop(Node** head)
+void pop(Node **head)
 {
-	if(!isEmpty(head)) {
-		Node* temp = *head;
+	if (!isEmpty(head)) {
+		Node *temp = *head;
 		(*head) = (*head)->next;
 		free(temp);
 	}
@@ -92,97 +88,102 @@ void pop(Node** head)
 
 
 
-
-// Driver code
 int main(int argc, char **argv)
 {
-	int i, j, nr_spaces;
+	int i, j, spaces, nr_args;
 	FILE *file;
 	char line[2000];
-	char *p;
-	int read;
-	unsigned long len = 0;
 	char cmd[200];
 	char val[200];
 	long priority;
 	// Create a Priority Queue
 	Node *pq = NULL;
+
 	fail = 0;
 
-
 	// Open file if exists
-	if (argc > 1) {
+	if (argc > 1)
 		for (i = 1; i < argc; i++) {
-			if (fail) break;
-			if ((file = fopen(argv[i], "r"))) {
-				while (fgets(line, sizeof(line), file) != NULL) {
-					sscanf(line, "%s", cmd);
-					// Verify if this line is a valid command. If YES then execute it.
-					if (strncmp(line, "insert", 6) == 0 && strlen(line) > 8) {
-						nr_spaces = 0;
-						for(j = 0; j < strlen(line); j++) {
-							if(line[j] == ' ') {
-								nr_spaces = nr_spaces + 1;
-							}
-						}
-						if (nr_spaces != 2) {
-							continue;
-						}
-						// Valid insert
-						sscanf(line, "%s %s %ld", cmd, val, &priority);
-						if(isEmpty(&pq)) {
-							pq = newNode(val, priority);
-						} else {
-							insert(&pq, val, priority);
-						}
-					} else if (strncmp(line, "top", 3) == 0 && strlen(line) <= 5) {
-						if(!isEmpty(&pq)) {
-							printf("%s\n", top(&pq));
-						} 
-					} else if (strncmp(line, "pop", 3) == 0 && strlen(line) <= 5) {
-						pop(&pq);
-					}
+			if (fail)
+				break;
+			file = fopen(argv[i], "r");
+			if (file == NULL)
+				continue;
+			while (fgets(line, sizeof(line), file) != NULL) {
+				nr_args = sscanf(line, "%s", cmd);
+				if (nr_args != 1)
+					continue;
+				// Verify if this line is a valid command.
+				//If YES then execute it.
+				if (strncmp(line, "insert", 6) == 0
+					&& strlen(line) > 8) {
+					spaces = 0;
+					for (j = 0; j < strlen(line); j++)
+						if (line[j] == ' ')
+							spaces = spaces + 1;
+					if (spaces != 2)
+						continue;
+					// Valid insert
+					nr_args = sscanf(line, "%s %s %ld",
+						cmd, val, &priority);
+					if (nr_args != 3)
+						continue;
+					if (isEmpty(&pq))
+						pq = newNode(val, priority);
+					else
+						insert(&pq, val, priority);
+				} else if (strncmp(line, "top", 3) == 0 &&
+					strlen(line) <= 5) {
+					if (!isEmpty(&pq))
+						printf("%s\n", top(&pq));
+				} else if (strncmp(line, "pop", 3) == 0 &&
+					strlen(line) <= 5)
+					pop(&pq);
 
-					if (feof(file)) {
-						break;
-					}
-				}
-				fclose(file);
+				if (feof(file))
+					break;
 			}
+			fclose(file);
 		}
-	} else {
-
-		while(fgets(line, sizeof(line), stdin)) {
-			if(fail) break;
-			sscanf(line, "%s", cmd);
-			// Verify if this line is a valid command. If YES then execute it.
-			if (strncmp(line, "insert", 6) == 0 && strlen(line) > 8) {
-				nr_spaces = 0;
-				for(j = 0; j < strlen(line); j++)
-					if(line[j] == ' ')
-						nr_spaces = nr_spaces + 1;
-				if (nr_spaces != 2)
+	else
+		while (fgets(line, sizeof(line), stdin)) {
+			if (fail)
+				break;
+			nr_args = sscanf(line, "%s", cmd);
+			if (nr_args != 1)
+				continue;
+			// Verify if this line is a valid command.
+			// If YES then execute it.
+			if (strncmp(line, "insert", 6) == 0 &&
+				strlen(line) > 8) {
+				spaces = 0;
+				for (j = 0; j < strlen(line); j++)
+					if (line[j] == ' ')
+						spaces = spaces + 1;
+				if (spaces != 2)
 					continue;
 				// Valid insert
-				sscanf(line, "%s %s %ld", cmd, val, &priority);
-				if(isEmpty(&pq))
+				nr_args = sscanf(line, "%s %s %ld",
+					cmd, val, &priority);
+				if (nr_args != 3)
+					continue;
+				if (isEmpty(&pq))
 					pq = newNode(val, priority);
 				else
 					insert(&pq, val, priority);
-			} else if (strncmp(line, "top", 3) == 0 && strlen(line) <= 5)
-				if(!isEmpty(&pq))
+			} else if (strncmp(line, "top", 3) == 0 &&
+				strlen(line) <= 5) {
+				if (!isEmpty(&pq))
 					printf("%s\n", top(&pq));
-			else if (strncmp(line, "pop", 3) == 0 && strlen(line) <= 5)
+			} else if (strncmp(line, "pop", 3) == 0 &&
+				strlen(line) <= 5)
 				pop(&pq);
 		}
-	}
 
-	while(!isEmpty(&pq)) 
-	{
+	while (!isEmpty(&pq))
 		pop(&pq);
-	}
 
-
-	if (fail) return 12;
+	if (fail)
+		return 12;
 	return 0;
 }
