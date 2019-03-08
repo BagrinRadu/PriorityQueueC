@@ -39,10 +39,9 @@ void insert(Node **head, char d[200], int p)
 	Node *temp = newNode(d, p);
 
 	if (temp != NULL) {
-		// Special Case: The head of list has lesser
+		// Special Case: The head of list has higher
 		// priority than new node. So insert new
 		// node before head node and change head node.
-		//if ((*head)->priority < p) {
 		if (compare((*head)->priority, p) < 0) {
 			// Insert New Node before head
 			temp->next = *head;
@@ -75,8 +74,7 @@ char *top(Node **head)
 	return (*head)->data;
 }
 
-// Removes the element with the
-// highest priority form the list
+// Removes the element with the highest priority form the list
 void pop(Node **head)
 {
 	if (!isEmpty(head)) {
@@ -86,11 +84,19 @@ void pop(Node **head)
 	}
 }
 
+int countSpaces(char *line)
+{
+	int spaces = 0, j;
 
+	for (j = 0; j < strlen(line); j++)
+		if (line[j] == ' ')
+			spaces = spaces + 1;
+	return spaces;
+}
 
 int main(int argc, char **argv)
 {
-	int i, j, spaces, nr_args;
+	int i, spaces, nr_args;
 	FILE *file;
 	char line[2000];
 	char cmd[200];
@@ -114,13 +120,10 @@ int main(int argc, char **argv)
 				if (nr_args != 1)
 					continue;
 				// Verify if this line is a valid command.
-				//If YES then execute it.
+				// If YES then execute it.
 				if (strncmp(line, "insert", 6) == 0
 					&& strlen(line) > 8) {
-					spaces = 0;
-					for (j = 0; j < strlen(line); j++)
-						if (line[j] == ' ')
-							spaces = spaces + 1;
+					spaces = countSpaces(line);
 					if (spaces != 2)
 						continue;
 					// Valid insert
@@ -156,10 +159,7 @@ int main(int argc, char **argv)
 			// If YES then execute it.
 			if (strncmp(line, "insert", 6) == 0 &&
 				strlen(line) > 8) {
-				spaces = 0;
-				for (j = 0; j < strlen(line); j++)
-					if (line[j] == ' ')
-						spaces = spaces + 1;
+				spaces = countSpaces(line);
 				if (spaces != 2)
 					continue;
 				// Valid insert
@@ -180,9 +180,11 @@ int main(int argc, char **argv)
 				pop(&pq);
 		}
 
+	// Empty the queue if not empty then return
 	while (!isEmpty(&pq))
 		pop(&pq);
 
+	// If there was a malloc fail return 12
 	if (fail)
 		return 12;
 	return 0;
