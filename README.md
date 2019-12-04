@@ -1,3 +1,3 @@
-# SO_Tema1
+# Priority Queue implementation
 
-Tema 1 - Sisteme de Operare - Coada cu prioritati
+Assignment 1 - Operating Systems - Priority Queue implementation in C language
